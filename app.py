@@ -34,7 +34,7 @@ import tensorflow as tf
 from utils import (
     get_pose_landmarks, landmarks_to_dict, extract_feature_vector,
     sub_classify_activity, draw_pose_and_label, ankle_midpoint,
-    is_fall_alert, FEATURE_COLUMNS,
+    is_fall_alert, is_lying_down, FEATURE_COLUMNS,
 )
 import mediapipe as mp
  
@@ -76,6 +76,13 @@ def predict_frame(frame_bgr, pose_estimator, nn_model, scaler, le, prev_ankle=No
  
     if raw_label == "fall":
         final_label = "Fall Detected"
+    elif is_lying_down(lm_dict):
+        # Geometric override: trained model said not_fall, but the torso
+        # is near-horizontal, meaning the person is on the ground. This
+        # catches "still lying there after the fall" frames that the
+        # dataset's fall-window-only labels don't cover (see utils.py).
+        final_label = "Fall Detected"
+        confidence = max(confidence, 0.75)
     else:
         final_label = sub_classify_activity(lm_dict, ankle_motion=ankle_motion)
  
