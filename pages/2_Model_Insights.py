@@ -1,23 +1,3 @@
-"""
-pages/2_Model_Insights.py
- 
-FA-2, Step 6 extra evaluation evidence.
- 
-Self-contained: uses the REAL precision/recall/F1/accuracy numbers from
-4_evaluate_model.py's actual test-set run (hardcoded here), so this page
-has no dependency on any file existing in the repo.
- 
-Three deliberately different chart types, each picked to fit what it's
-showing:
-  - Radar/spider chart  -> Precision/Recall/F1 per class (3 axes = a
-                            natural triangle shape, easy to compare the
-                            two classes' "footprint")
-  - Line / slope chart  -> NN vs RF across three metrics, showing the
-                            trade-off as two diverging lines
-  - Funnel / chevron     -> key headline metrics ranked top to bottom,
-                            KPI-dashboard style
-"""
- 
 import plotly.graph_objects as go
 import streamlit as st
  
@@ -48,7 +28,7 @@ st.caption(
     "52 fall / 895 not_fall)."
 )
  
-# ---- Real numbers from 4_evaluate_model.py's actual test-set run ----
+
 nn_metrics = {"precision": {"fall": 0.270, "not_fall": 0.975},
               "recall":    {"fall": 0.596, "not_fall": 0.906},
               "f1":        {"fall": 0.371, "not_fall": 0.939}}
@@ -57,9 +37,7 @@ rf_metrics = {"precision": {"fall": 0.750, "not_fall": 0.954},
               "f1":        {"fall": 0.281, "not_fall": 0.975}}
 nn_accuracy, rf_accuracy = 0.8891, 0.9514
  
-# ============================================================
-# CHART 1: Radar / spider (triangle) -- Precision/Recall/F1 per class
-# ============================================================
+
 st.header("Precision · Recall · F1 — Class Footprint")
 st.caption("Each class's shape across the three metrics -- a balanced model would look like an even triangle; a lopsided shape reveals a trade-off, exactly what we see for the fall class.")
  
@@ -86,9 +64,7 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
  
-# ============================================================
-# CHART 2: Line / slope chart -- NN vs RF trade-off
-# ============================================================
+
 st.header("Dense NN vs Random Forest — The Trade-off")
 st.caption(
     "Random Forest wins on raw accuracy, but its fall-recall line drops "
@@ -124,9 +100,7 @@ c2.metric("Dense NN — Fall Recall", f"{nn_metrics['recall']['fall']*100:.1f}%"
           delta=f"+{(nn_metrics['recall']['fall']-rf_metrics['recall']['fall'])*100:.1f}% vs RF")
 c3.metric("Random Forest — Accuracy", f"{rf_accuracy*100:.1f}%")
  
-# ============================================================
-# CHART 3: Funnel / chevron -- key metrics ranked
-# ============================================================
+
 st.header("Key Metrics — Ranked Overview")
 st.caption("Headline numbers for the deployed Dense NN model, ranked highest to lowest.")
  
