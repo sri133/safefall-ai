@@ -1,12 +1,3 @@
-"""
-pages/1_EDA_Dashboard.py
-
-FA-1, Step 3 evidence, rendered live in the deployed Streamlit app.
-Self-contained: real counts hardcoded from the actual dataset run, no
-external CSV needed. Matches the dark "control room" theme used
-throughout the app.
-"""
-
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
