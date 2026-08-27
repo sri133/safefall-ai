@@ -1,20 +1,3 @@
-"""
-2_extract_pose_landmarks.py
-
-Step 4/5: run MediaPipe Pose over every extracted frame and build a table
-of (feature_vector, label) pairs ready for training.
-
-This is the "pose estimation" half of the pipeline the rubric asks for.
-Frames where MediaPipe can't find a person confidently are dropped (logged
-to the console) — this itself is worth mentioning in your EDA / deployment
-challenges discussion (occlusion, bad angles, etc.).
-
-Run in Colab:
-    !python 2_extract_pose_landmarks.py \
-        --labels_csv /content/frames/labels.csv \
-        --out_csv /content/landmarks.csv
-"""
-
 import argparse
 
 import cv2
