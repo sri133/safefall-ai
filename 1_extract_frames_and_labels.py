@@ -1,38 +1,3 @@
-"""
-1_extract_frames_and_labels.py
-
-Step 4/5 groundwork: turn the raw Le2i / IMVIA fall dataset into labelled
-image frames.
-
-EXPECTED DATASET LAYOUT (this is how the Kaggle "falldataset-imvia" set is
-organised — adjust SCENE_FOLDERS below if yours differs slightly):
-
-    dataset_root/
-        Coffee_room_01/
-            Videos/            *.avi
-            Annotation_files/  *.txt   (same stem name as the video)
-        Coffee_room_02/...
-        Home_01/...
-        Home_02/...
-        Lecture_room/...
-        Office/...
-
-ANNOTATION FORMAT (standard Le2i format):
-    line 1: frame number where the fall STARTS  (0 if no fall in this video)
-    line 2: frame number where the fall ENDS    (0 if no fall in this video)
-    remaining lines: per-frame bounding box info (not used here)
-
-We sample every Nth frame from each video, and label each sampled frame:
-    - "fall"      if its frame index falls within [start, end]
-    - "not_fall"  otherwise
-
-Run in Colab:
-    !python 1_extract_frames_and_labels.py \
-        --dataset_root /content/falldataset-imvia \
-        --out_dir /content/frames \
-        --sample_every 5
-"""
-
 import argparse
 import csv
 import os
@@ -70,7 +35,7 @@ def find_pairs(dataset_root):
         video_dir = scene_dir / "Videos"
         ann_dir = scene_dir / "Annotation_files"
         if not video_dir.exists():
-            # some Kaggle mirrors flatten the structure - search recursively
+            
             video_dir = scene_dir
         if not ann_dir.exists():
             ann_dir = scene_dir
@@ -78,7 +43,7 @@ def find_pairs(dataset_root):
         for vid_path in video_dir.rglob("*.avi"):
             candidate = ann_dir / (vid_path.stem + ".txt")
             if not candidate.exists():
-                # try a recursive search as a fallback
+                
                 matches = list(ann_dir.rglob(vid_path.stem + ".txt"))
                 candidate = matches[0] if matches else None
             yield vid_path, candidate, scene_dir.name
@@ -118,7 +83,7 @@ def extract_frames(dataset_root, out_dir, sample_every=5, img_size=224):
             label = "fall" if is_fall else "not_fall"
 
             frame_resized = cv2.resize(frame, (img_size, img_size))
-            # blur / corruption check: skip near-black or near-white frames
+            
             mean_val = frame_resized.mean()
             if mean_val < 5 or mean_val > 250:
                 continue
