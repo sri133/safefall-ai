@@ -1,20 +1,3 @@
-"""
-utils.py
---------
-Shared functions used across preprocessing, training, evaluation and the
-Streamlit app. Keeping these in one place means the EXACT same feature
-extraction logic is used at training time and at inference time (a very
-common bug is letting these drift apart).
- 
-Covers:
-  - Running MediaPipe Pose on a single frame
-  - Converting raw landmarks into a scale/position-invariant feature vector
-  - Rule-based sub-classification of non-fall frames into
-    Walking / Sitting / Standing / Normal Activity
-  - Drawing the skeleton + label on a frame
-  - Simple alert logic
-"""
- 
 import base64
 import io
 import struct
@@ -27,7 +10,7 @@ import mediapipe as mp
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
  
-# Landmark indices we care about (MediaPipe's 33-point model)
+
 LM = mp_pose.PoseLandmark
  
 FEATURE_LANDMARKS = [
@@ -135,9 +118,9 @@ def compute_heuristic_features(landmark_dict):
     mid_shoulder = (ls + rs) / 2.0
     torso_size = np.linalg.norm(mid_shoulder - mid_hip) + 1e-6
  
-    # Torso tilt from vertical (0 = perfectly upright)
+    
     torso_vec = mid_shoulder - mid_hip
-    vertical = np.array([0.0, -1.0])  # image y grows downward
+    vertical = np.array([0.0, -1.0])  
     cosang = np.clip(
         np.dot(torso_vec, vertical) / (np.linalg.norm(torso_vec) + 1e-6), -1, 1
     )
@@ -145,8 +128,7 @@ def compute_heuristic_features(landmark_dict):
  
     knee_angle = (_angle(lh, lk, la) + _angle(rh, rk, ra)) / 2.0
  
-    # Hip-to-ankle vertical distance normalised by torso size:
-    # small -> hips close to feet height (sitting), large -> standing/walking
+    
     hip_ankle_vert = ((la[1] - lh[1]) + (ra[1] - rh[1])) / 2.0 / torso_size
  
     return {
@@ -219,15 +201,15 @@ def sub_classify_activity(landmark_dict, ankle_motion=None):
     """
     h = compute_heuristic_features(landmark_dict)
  
-    # Sitting: knees sharply bent AND hips relatively close to ankle height
+    
     if h["knee_angle"] < 130 and h["hip_ankle_vert"] < 1.3:
         return "Sitting"
  
-    # Significant limb motion between frames -> Walking
+    
     if ankle_motion is not None and ankle_motion > 0.15:
         return "Walking"
  
-    # Upright, legs extended, little motion -> Standing
+    
     if h["knee_angle"] >= 150 and h["torso_angle"] < 30:
         return "Standing"
  
