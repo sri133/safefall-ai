@@ -208,6 +208,16 @@ streamlit run app.py
 
 ---
 
+## Credits:
+
+**Student Name:** Sri Prasath. P
+
+**Mentor:** Arul Jothi
+
+**Course:** Machine Learning and Deep Learning
+
+**School Name:** Jain Vidyalaya IB World School
+
 ## Course Context
 
 Built for **Machine Learning and Deep Learning — Formative Assessment 1 & 2**, simulating CareVision HealthTech Pvt. Ltd.'s SafeFall AI initiative for elderly wellness and smart healthcare monitoring.
