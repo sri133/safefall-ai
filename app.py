@@ -1,18 +1,3 @@
-"""
-app.py
- 
-Step 7: Streamlit deployment -- SafeFall AI monitoring dashboard.
- 
-Features:
-  1. Alert History Log      -- table of every fall alert with thumbnail
-  2. Sound Alert             -- audible beep on fall detection (generated
-                                 in-memory, no external audio file)
-  3. Processing Speed Meter -- ms/frame + implied FPS
-  4. Downloadable PDF Report -- one-click incident report
-  5. Model Comparison        -- NN vs Random Forest side-by-side
-  6. Shift Report Card       -- end-of-session summary panel
-"""
- 
 import base64
 import io
 import os
@@ -41,7 +26,7 @@ MODEL_DIR = os.environ.get("MODEL_DIR", "model")
  
 st.set_page_config(page_title="SafeFall AI — Elderly Monitoring", layout="wide")
  
-# ---------------- Dark "control room" theme ----------------
+
 st.markdown("""
 <style>
 .stApp {
@@ -144,7 +129,7 @@ def predict_frame(frame_bgr, pose_estimator, nn_model, scaler, le, prev_ankle=No
         "fall_prob": fall_prob, "lm_dict": lm_dict, "ankle_pos": ankle_pos,
     }
  
-    # Feature 5: Model Comparison -- run RF on the same features
+    
     if rf_model is not None:
         rf_probs = rf_model.predict_proba(feats_scaled)[0]
         rf_pred_idx = int(np.argmax(rf_probs))
@@ -155,7 +140,7 @@ def predict_frame(frame_bgr, pose_estimator, nn_model, scaler, le, prev_ankle=No
         result["rf_confidence"] = rf_confidence
         result["rf_fall_prob"] = rf_fall_prob
  
-    # Feature 3: processing speed
+    
     result["elapsed_ms"] = (time.perf_counter() - t0) * 1000.0
     return result
  
@@ -260,7 +245,7 @@ def build_pdf_report(counts, confidences, fall_events, avg_speed_ms, monitored_s
     return buf
  
  
-# ---------------- UI ----------------
+
 st.title("🏥 SafeFall AI — Elderly Fall Detection & Monitoring")
 st.caption(
     "CareVision HealthTech — Computer Vision based elderly activity monitoring. "
@@ -329,7 +314,7 @@ with tab_monitor:
                 else:
                     alert_placeholder.markdown('<div class="safe-banner">✅ No fall detected.</div>', unsafe_allow_html=True)
  
-        else:  # Video
+        else:  
             tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
             tfile.write(uploaded.read())
             cap = cv2.VideoCapture(tfile.name)
@@ -343,10 +328,10 @@ with tab_monitor:
                 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or 1
  
                 frame_gallery = []
-                alert_log = []          # Feature 1: alert history log
+                alert_log = []          
                 nn_prob_history = []
                 rf_prob_history = []
-                speed_samples = []      # Feature 3
+                speed_samples = []      
                 prev_ankle = None
                 idx = 0
                 fall_events = []
@@ -403,7 +388,7 @@ with tab_monitor:
                     alert_placeholder.markdown('<div class="safe-banner">✅ No falls detected in this video.</div>', unsafe_allow_html=True)
  
                 with results_area:
-                    # ---- Feature 6: Shift Report Card ----
+                    
                     st.markdown('<div class="shift-card">', unsafe_allow_html=True)
                     st.subheader("📋 Shift Report")
                     r1, r2, r3, r4 = st.columns(4)
@@ -413,21 +398,21 @@ with tab_monitor:
                     r4.metric("Avg. speed", f"{avg_speed_ms:.1f} ms/frame")
                     st.markdown('</div>', unsafe_allow_html=True)
  
-                    # ---- Feature 4: PDF download ----
+                    
                     pdf_buf = build_pdf_report(counts, confidences, fall_events, avg_speed_ms, monitored_seconds, alert_log)
                     st.download_button(
                         "📄 Download Incident Report (PDF)", data=pdf_buf,
                         file_name="safefall_incident_report.pdf", mime="application/pdf",
                     )
  
-                    # ---- Feature 5: NN vs RF timeline ----
+                    
                     if nn_prob_history:
                         st.plotly_chart(probability_timeline_chart(nn_prob_history, rf_prob_history), use_container_width=True)
  
                     if last_radar:
                         st.plotly_chart(radar_chart(last_radar, last_label), use_container_width=True)
  
-                    # ---- Feature 1: Alert History Log ----
+                    
                     if alert_log:
                         st.subheader("🚨 Alert History Log")
                         log_cols = st.columns(4)
