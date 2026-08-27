@@ -1,18 +1,3 @@
-"""
-4_evaluate_model.py
-
-Step 6: Model Evaluation and Testing.
-
-Loads the held-out test split saved by 3_train_model.py, runs the trained
-NN model on it, and produces exactly the evidence the rubric asks for:
-  - Accuracy, Precision, Recall, F1-score (classification_report)
-  - Confusion matrix (as a heatmap image)
-  - A short printed discussion of likely error sources
-
-Run in Colab:
-    !python 4_evaluate_model.py --model_dir /content/model
-"""
-
 import argparse
 import os
 
@@ -40,7 +25,7 @@ def main(model_dir):
     y_test = le.transform(df_test["label"].values)
     X_test_s = scaler.transform(X_test)
 
-    # --- NN evaluation ---
+    
     y_prob = nn_model.predict(X_test_s, verbose=0)
     y_pred = np.argmax(y_prob, axis=1)
 
@@ -66,7 +51,7 @@ def main(model_dir):
     plt.savefig(os.path.join(model_dir, "confusion_matrix_nn.png"), dpi=150)
     print(f"Saved confusion_matrix_nn.png")
 
-    # --- RF comparison (baseline) ---
+    
     y_pred_rf = rf_model.predict(X_test_s)
     acc_rf = accuracy_score(y_test, y_pred_rf)
     print(f"\n=== Random Forest Baseline — Test Set ===")
